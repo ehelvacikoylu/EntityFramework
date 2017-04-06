@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -47,11 +46,11 @@ namespace Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal
         ///     This API supports the Entity Framework Core infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
-        protected override Expression VisitEntityQueryable(Type elementType)
+        protected override Expression VisitEntityQueryable(IEntityQueryable entityQueryable)
         {
-            Check.NotNull(elementType, nameof(elementType));
+            Check.NotNull(entityQueryable, nameof(entityQueryable));
 
-            var entityType = _model.FindEntityType(elementType);
+            var entityType = entityQueryable.EntityType ?? _model.FindEntityType(entityQueryable.ElementType);
 
             if (QueryModelVisitor.QueryCompilationContext
                 .QuerySourceRequiresMaterialization(_querySource))
@@ -59,7 +58,7 @@ namespace Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal
                 var materializer = _materializerFactory.CreateMaterializer(entityType);
 
                 return Expression.Call(
-                    InMemoryQueryModelVisitor.EntityQueryMethodInfo.MakeGenericMethod(elementType),
+                    InMemoryQueryModelVisitor.EntityQueryMethodInfo.MakeGenericMethod(entityQueryable.ElementType),
                     EntityQueryModelVisitor.QueryContextParameter,
                     Expression.Constant(entityType),
                     Expression.Constant(entityType.FindPrimaryKey()),

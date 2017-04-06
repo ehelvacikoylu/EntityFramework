@@ -56,12 +56,13 @@ namespace Microsoft.EntityFrameworkCore.Internal
 
         private EntityQueryable<TEntity> CreateEntityQueryable()
         {
-            if (_context.Model.FindEntityType(typeof(TEntity)) == null)
+            var entityType = _context.Model.FindEntityType(typeof(TEntity));
+            if (entityType == null)
             {
                 throw new InvalidOperationException(CoreStrings.InvalidSetType(typeof(TEntity).ShortDisplayName()));
             }
 
-            return new EntityQueryable<TEntity>(_context.QueryProvider);
+            return new EntityQueryable<TEntity>(_context.QueryProvider, entityType);
         }
 
         /// <summary>

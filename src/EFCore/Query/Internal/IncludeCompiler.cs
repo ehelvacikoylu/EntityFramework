@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation. All rights reserved.
+﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -1017,25 +1017,7 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                 .Select(
                     includeResultOperator =>
                         {
-                            var entityType
-                                = _queryCompilationContext.Model
-                                    .FindEntityType(includeResultOperator.PathFromQuerySource.Type);
-
-                            var parts = includeResultOperator.NavigationPropertyPaths.ToArray();
-                            var navigationPath = new INavigation[parts.Length];
-
-                            for (var i = 0; i < parts.Length; i++)
-                            {
-                                navigationPath[i] = entityType.FindNavigation(parts[i]);
-
-                                if (navigationPath[i] == null)
-                                {
-                                    throw new InvalidOperationException(
-                                        CoreStrings.IncludeBadNavigation(parts[i], entityType.DisplayName()));
-                                }
-
-                                entityType = navigationPath[i].GetTargetType();
-                            }
+                            var navigationPath = includeResultOperator.GetNavigationPath(_queryCompilationContext);
 
                             var querySourceReferenceExpression
                                 = querySourceTracingExpressionVisitor

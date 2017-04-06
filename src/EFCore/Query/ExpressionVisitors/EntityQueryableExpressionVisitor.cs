@@ -1,8 +1,6 @@
-// Copyright (c) .NET Foundation. All rights reserved.
+﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.Linq;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -32,14 +30,14 @@ namespace Microsoft.EntityFrameworkCore.Query.ExpressionVisitors
         /// <returns> An expression to use in place of the node. </returns>
         protected override Expression VisitConstant(ConstantExpression constantExpression)
             => constantExpression.IsEntityQueryable()
-                ? VisitEntityQueryable(((IQueryable)constantExpression.Value).ElementType)
+                ? VisitEntityQueryable((IEntityQueryable)constantExpression.Value)
                 : constantExpression;
 
         /// <summary>
         ///     Visits entity type roots.
         /// </summary>
-        /// <param name="elementType"> The entity type of the root. </param>
+        /// <param name="entityQueryable"> The root entity queryable. </param>
         /// <returns> An expression to use in place of the node. </returns>
-        protected abstract Expression VisitEntityQueryable([NotNull] Type elementType);
+        protected abstract Expression VisitEntityQueryable([NotNull] IEntityQueryable entityQueryable);
     }
 }

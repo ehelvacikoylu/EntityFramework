@@ -136,16 +136,16 @@ namespace Microsoft.EntityFrameworkCore.Query.ExpressionVisitors
         /// <summary>
         ///     Visit an entity query root.
         /// </summary>
-        /// <param name="elementType"> The CLR type of the entity root. </param>
+        /// <param name="entityQueryable"> The root entity queryable. </param>
         /// <returns>
         ///     An Expression corresponding to the translated entity root.
         /// </returns>
-        protected override Expression VisitEntityQueryable(Type elementType)
+        protected override Expression VisitEntityQueryable(IEntityQueryable entityQueryable)
         {
-            Check.NotNull(elementType, nameof(elementType));
+            Check.NotNull(entityQueryable, nameof(entityQueryable));
 
             var relationalQueryCompilationContext = QueryModelVisitor.QueryCompilationContext;
-            var entityType = _model.FindEntityType(elementType);
+            var entityType = entityQueryable.EntityType ?? _model.FindEntityType(entityQueryable.ElementType);
 
             var selectExpression = _selectExpressionFactory.Create(relationalQueryCompilationContext);
 
@@ -223,7 +223,7 @@ namespace Microsoft.EntityFrameworkCore.Query.ExpressionVisitors
                 }
             }
 
-            var shaper = CreateShaper(elementType, entityType, selectExpression);
+            var shaper = CreateShaper(entityQueryable.ElementType, entityType, selectExpression);
 
             return Expression.Call(
                 QueryModelVisitor.QueryCompilationContext.QueryMethodProvider // TODO: Don't use ShapedQuery when projecting

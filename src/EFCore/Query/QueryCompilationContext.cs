@@ -107,6 +107,14 @@ namespace Microsoft.EntityFrameworkCore.Query
         public virtual QuerySourceMapping QuerySourceMapping { get; } = new QuerySourceMapping();
 
         /// <summary>
+        ///     Gets the mapping to query source
+        /// </summary>
+        /// <value>
+        ///     The mapping to query source
+        /// </value>
+        public virtual Dictionary<IQuerySource, IEntityType> QuerySourceEntityTypeMapping { get; } = new Dictionary<IQuerySource, IEntityType>();
+
+        /// <summary>
         ///     Adds or updates the expression mapped to a query source.
         /// </summary>
         /// <param name="querySource"> The query source. </param>
@@ -128,7 +136,7 @@ namespace Microsoft.EntityFrameworkCore.Query
         }
 
         /// <summary>
-        ///     Gets the query annotations./
+        ///     Gets the query annotations.
         /// </summary>
         /// <value>
         ///     The query annotations.
@@ -220,7 +228,8 @@ namespace Microsoft.EntityFrameworkCore.Query
             {
                 if (constantExpression.IsEntityQueryable())
                 {
-                    var entityType = _model.FindEntityType(((IQueryable)constantExpression.Value).ElementType);
+                    var entityQueryable = (IEntityQueryable)constantExpression.Value;
+                    var entityType = entityQueryable.EntityType ?? _model.FindEntityType(entityQueryable.ElementType);
 
                     if (entityType != null)
                     {

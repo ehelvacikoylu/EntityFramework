@@ -5,6 +5,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.EntityFrameworkCore.Utilities;
 
@@ -21,17 +22,18 @@ namespace Microsoft.EntityFrameworkCore.Extensions.Internal
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public static ConstantExpression CreateEntityQueryableExpression(
-            [NotNull] this IAsyncQueryProvider entityQueryProvider, [NotNull] Type type)
+            [NotNull] this IAsyncQueryProvider entityQueryProvider, [NotNull] IEntityType entityType)
         {
             Check.NotNull(entityQueryProvider, nameof(entityQueryProvider));
-            Check.NotNull(type, nameof(type));
+            Check.NotNull(entityType, nameof(entityType));
 
             return Expression.Constant(
                 _createEntityQueryableMethod
-                    .MakeGenericMethod(type)
+                    .MakeGenericMethod(entityType.ClrType)
                     .Invoke(null, new object[]
                     {
-                        entityQueryProvider
+                        entityQueryProvider,
+                        entityType
                     }));
         }
 
@@ -41,7 +43,8 @@ namespace Microsoft.EntityFrameworkCore.Extensions.Internal
 
         [UsedImplicitly]
         // ReSharper disable once InconsistentNaming
-        private static EntityQueryable<TResult> _CreateEntityQueryable<TResult>(IAsyncQueryProvider entityQueryProvider)
-            => new EntityQueryable<TResult>(entityQueryProvider);
+        private static EntityQueryable<TResult> _CreateEntityQueryable<TResult>(
+            IAsyncQueryProvider entityQueryProvider, IEntityType entityType)
+            => new EntityQueryable<TResult>(entityQueryProvider, entityType);
     }
 }

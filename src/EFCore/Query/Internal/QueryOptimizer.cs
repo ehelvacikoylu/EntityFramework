@@ -271,7 +271,7 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                                 = new MainFromClause(
                                     oldQuerySource.ItemName,
                                     entityType.ClrType,
-                                    entityQueryProvider.CreateEntityQueryableExpression(entityType.ClrType));
+                                    entityQueryProvider.CreateEntityQueryableExpression(entityType));
 
                             queryModel.MainFromClause = newMainFromClause;
 
