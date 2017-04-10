@@ -20,11 +20,21 @@ namespace Microsoft.EntityFrameworkCore.Specification.Tests
 {
     public abstract class TestHelpers
     {
-        public static void AssertBaseline(string expected, string actual, ITestOutputHelper testOutputHelper)
+        public static void AssertBaseline(ITestOutputHelper testOutputHelper, string actual, params string[] expectedFragments)
         {
             try
             {
-                Assert.Equal(expected, actual);
+                if (expectedFragments.Length == 1)
+                {
+                    Assert.Equal(expectedFragments[0], actual);
+                }
+                else
+                {
+                    foreach (var expectedFragment in expectedFragments)
+                    {
+                        Assert.Contains(expectedFragment, actual);
+                    }
+                }
             }
             catch
             {
@@ -32,8 +42,7 @@ namespace Microsoft.EntityFrameworkCore.Specification.Tests
                     $@"
 -- NEW BASELINE -------------------------------------------------------------------------------------------------------------------------
             AssertSql(
-                @""{actual}"",
-                Sql);
+                @""{actual.Substring(0, Math.Min(actual.Length, 2000))}"");
 ----------------------------------------------------------------------------------------------------------------------------------------");
 
                 throw;

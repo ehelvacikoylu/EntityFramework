@@ -1952,13 +1952,23 @@ namespace Microsoft.EntityFrameworkCore.Specification.Tests
         }
 
         [ConditionalFact]
-        public virtual void Where_ternary_boolean_condition()
+        public virtual void Where_ternary_boolean_condition_true()
         {
-            var flag = new Random().Next(0, 2) == 1;
+            var flag = true;
 
             AssertQuery<Product>(ps => ps
                     .Where(p => flag ? p.UnitsInStock >= 20 : p.UnitsInStock < 20),
-                entryCount: flag ? 51 : 26);
+                entryCount: 51);
+        }
+
+        [ConditionalFact]
+        public virtual void Where_ternary_boolean_condition_false()
+        {
+            var flag = false;
+
+            AssertQuery<Product>(ps => ps
+                    .Where(p => flag ? p.UnitsInStock >= 20 : p.UnitsInStock < 20),
+                entryCount: 26);
         }
 
         [ConditionalFact]
@@ -1974,14 +1984,24 @@ namespace Microsoft.EntityFrameworkCore.Specification.Tests
         }
 
         [ConditionalFact]
-        public virtual void Where_ternary_boolean_condition_with_false_as_result()
+        public virtual void Where_ternary_boolean_condition_with_false_as_result_true()
         {
-            var flag = new Random().Next(0, 2) == 1;
+            var flag = true;
 
             AssertQuery<Product>(ps => ps
                     // ReSharper disable once SimplifyConditionalTernaryExpression
                     .Where(p => flag ? p.UnitsInStock >= 20 : false),
-                entryCount: flag ? 51 : 0);
+                entryCount: 51);
+        }
+
+        [ConditionalFact]
+        public virtual void Where_ternary_boolean_condition_with_false_as_result_false()
+        {
+            var flag = false;
+
+            AssertQuery<Product>(ps => ps
+                    // ReSharper disable once SimplifyConditionalTernaryExpression
+                    .Where(p => flag ? p.UnitsInStock >= 20 : false));
         }
 
         [ConditionalFact]
